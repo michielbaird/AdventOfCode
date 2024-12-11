@@ -83,7 +83,7 @@ fn part_two(map: &Vec<Vec<i32>>) -> i64 {
         });
     }
 
-    
+
     //println!("{:?} {:?}", values, reverse);
     reverse.get(&0).unwrap().iter().map(|&(r,c)| {
         values[r][c] as i64
