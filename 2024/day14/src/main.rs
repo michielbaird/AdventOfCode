@@ -82,10 +82,16 @@ fn main() -> Result<(), Box<dyn Error>> {
             caps[4].parse::<i64>().unwrap(),
         )
     }).collect::<Vec<_>>();
+    println!("[");
+    for line in input.iter() {
+        println!("[{},{},{},{}],", line.0, line.1, line.2, line.3);
+    }
+    println!("]");
+
 
     let part_1 = part_one(&input, 100, false);
     let part_2 = part_two(&input);
-    part_one(&input, part_2, true);
+    //part_one(&input, part_2, true);
     println!("Part 1: {}", part_1);
     println!("Part 2: {}", part_2);
 
