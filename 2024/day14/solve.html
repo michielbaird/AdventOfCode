@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Canvas Example</title>
+    <script>
+        input = []; //insert json here
+    </script>
+</head>
+<body>
+    <canvas id="myCanvas" width="202" height="206"></canvas>
+    <div id="time"></div>
+    <div>    
+        <input style="width:100%;" type="range" id="b" name="test" min="4000" max="8700" oninput="draw(parseInt(this.value))" />
+    </div>
+    <script>
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Create an ImageData object for a single pixel
+        const imageData = ctx.createImageData(1, 1);
+        const data = imageData.data;
+
+        function draw(t) {
+            document.getElementById("time").innerHTML = "Time: " + t;
+            ctx.fillStyle = "rgba(255,255,255,1)";
+            ctx.fillRect( 0, 0, 202, 206);
+            input.forEach((value) => {
+                const tx = (((value[0] + t*value[2]) % 101) + 101) % 101;
+                const ty = (((value[1] + t*value[3]) % 103) + 103) % 103;
+                ctx.fillStyle = "rgba(0,0,0,1)";
+                ctx.fillRect( tx*2, ty*2, 2, 2);
+            });            
+        }
+        draw(0);
+    </script>
+</body>
+</html>
