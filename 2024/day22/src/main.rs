@@ -1,6 +1,5 @@
 use regex::Regex;
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::collections::VecDeque;
 use std::error::Error;
 use std::io::stdin;
