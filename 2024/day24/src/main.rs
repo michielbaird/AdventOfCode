@@ -114,7 +114,15 @@ impl<'a> Summer<'a> {
 }
 fn run_tests(summer: &mut Summer, tests: &Vec<(i64, i64)>, bits: i64) -> bool {
     let mut all_pass = true;
-    for &(a, b) in tests.iter() {
+    let extra = vec![
+        (1<<bits, 0), 
+        (0, 1<<bits), 
+        (1<<bits, 1<<bits),
+        (1<<(bits-1).max(0), 0), 
+        (0, 1<<(bits-1).max(0)), 
+        (1<<(bits-1).max(0), 1<<(bits-1).max(0))
+    ];
+    for &(a, b) in tests.iter().chain(extra.iter()) {
         let a = a & ((1 << bits)) - 1;
         let b = b & ((1 << bits)) - 1;
         let expected = a + b;
@@ -140,25 +148,34 @@ fn part_two(input_vals: &Vec<(&str, bool)>, gates: &Vec<(String, String, String,
     ];
     let mut summer = Summer::new(input_vals, gates);
     let mut swapped = vec![];
-    let mut original = summer.gates.clone();
+    let original = summer.gates.clone();
     let gates = summer.gates.keys().map(|&e|e).collect::<Vec<_>>();
     for bits in 0..=45 {
         println!("{} {:?}", bits, swapped);
         if !run_tests(&mut summer, &tests, bits) {
-            'next_test: for i in 0..(gates.len()-1) {
+            let mut try_swap = vec![];
+            for i in 0..(gates.len()-1) {
                 for j in (i+1)..(gates.len()) {
                     summer.swap_gates(gates[i], gates[j]);
                     if run_tests(&mut summer, &tests, bits + 1) {
-                        swapped.push(gates[i]);
-                        swapped.push(gates[j]);
-                        //summer.swap_gates(gates[i], gates[j]);
-                        break 'next_test;
+                        try_swap.push(gates[i]);
+                        try_swap.push(gates[j]);
+                        summer.swap_gates(gates[i], gates[j]);
+                        //break 'next_test;
                     } else {
                         summer.swap_gates(gates[i], gates[j]);
                     }
                 }
             }
-            if !run_tests(&mut summer, &tests, bits) {
+            if try_swap.len() > 2 {
+                println!("Failed: {:?}", try_swap);
+                break;
+            } else if try_swap.len() == 2 {
+                println!("Passed: {:?}", try_swap);
+                summer.swap_gates(try_swap[0], try_swap[1]);
+                swapped.extend(try_swap);
+            }
+            if !run_tests(&mut summer, &tests, bits + 1) {
                 swapped.pop();
                 swapped.pop();
             }
@@ -170,7 +187,7 @@ fn part_two(input_vals: &Vec<(&str, bool)>, gates: &Vec<(String, String, String,
         }
         final_swap
     });
-    println!("{:?} {:?}", swapped, answer);
+    //println!("{:?} {:?}", swapped, answer);
     answer.sort();
     answer.join(",")
 }
